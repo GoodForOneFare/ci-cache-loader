@@ -1,0 +1,7 @@
+name: ci-cache-loader
+
+up:
+  - node:
+      version: 10.13.0
+      yarn: 1.12.3
+
