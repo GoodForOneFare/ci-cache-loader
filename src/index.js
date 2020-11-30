@@ -1,58 +1,20 @@
 "use strict";
-var __assign = (this && this.__assign) || function () {
-    __assign = Object.assign || function(t) {
-        for (var s, i = 1, n = arguments.length; i < n; i++) {
-            s = arguments[i];
-            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
-                t[p] = s[p];
-        }
-        return t;
-    };
-    return __assign.apply(this, arguments);
-};
-var __read = (this && this.__read) || function (o, n) {
-    var m = typeof Symbol === "function" && o[Symbol.iterator];
-    if (!m) return o;
-    var i = m.call(o), r, ar = [], e;
-    try {
-        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
-    }
-    catch (error) { e = { error: error }; }
-    finally {
-        try {
-            if (r && !r.done && (m = i["return"])) m.call(i);
-        }
-        finally { if (e) throw e.error; }
-    }
-    return ar;
-};
-var __spread = (this && this.__spread) || function () {
-    for (var ar = [], i = 0; i < arguments.length; i++) ar = ar.concat(__read(arguments[i]));
-    return ar;
-};
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
-    result["default"] = mod;
-    return result;
-};
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-var fs = __importStar(require("fs"));
-var path = __importStar(require("path"));
-var loader_utils_1 = require("loader-utils");
-var mkdirp_1 = __importDefault(require("mkdirp"));
+
+import fs from "fs";
+import path from "path";
+
+const loader_utils_1 = require("loader-utils");
+const mkdirp_1 = require("mkdirp");
+
 // Switch to an import once https://github.com/nodejs/node/commit/0f63d84f807edb17466f9357a630467cf608f954 is released.
-var crypto = require('crypto');
-var async = require('neo-async');
-var _a = require('node-gzip'), gzip = _a.gzip, ungzip = _a.ungzip;
-var validateOptions = require('schema-utils');
-var pkg = require('../../package.json');
-var schema = require('../options.json');
-var env = process.env.NODE_ENV || 'development';
+const crypto = require('crypto');
+const async = require('neo-async');
+const {gzip, ungzip} = require('node-gzip');
+const validateOptions = require('schema-utils');
+const pkg = require('../../package.json');
+const schema = require('../options.json');
+const env = process.env.NODE_ENV || 'development';
+
 // eslint-disable-next-line no-warning-comments
 // todo: digest as stream?  It means reading twice on misses.
 var read = function (key, callback) {
@@ -157,7 +119,7 @@ function loader() {
     for (var _i = 0; _i < arguments.length; _i++) {
         args[_i] = arguments[_i];
     }
-    var options = __assign({}, createDefaults(), loader_utils_1.getOptions(this));
+    var options = {...createDefaults(), ...loader_utils_1.getOptions(this)};
     validateOptions(schema, options, 'CI Cache Loader');
     var cacheMetadata = options.cacheMetadata;
     if (!cacheMetadata) {
@@ -224,16 +186,16 @@ function loader() {
         if (err) {
             // eslint-disable-next-line no-console
             console.log('      @@ci-cache-loader - error for', res);
-            callback.apply(void 0, __spread([null], args));
+            callback(null, ...args);
             return;
         }
         if (!cache) {
             // eslint-disable-next-line no-console
             console.log('      @@ci-cache-loader - marked as uncacheable', res);
-            callback.apply(void 0, __spread([null], args));
+            callback(null, ...args);
             return;
         }
-        var _a = __read(taskResults, 2), deps = _a[0], contextDeps = _a[1];
+        const [deps, contextDeps] = taskResults;
         // eslint-disable-next-line no-console
         console.log('      @@ci-cache-loader - writing file:', res, '\n        cacheKey:', data.cacheKey, '\n        dependencies:', deps.length, '\n        contextDeps:', contextDependencies.length);
         writeFn(data.cacheKey, {
@@ -243,13 +205,13 @@ function loader() {
             result: args,
         }, function () {
             // ignore errors here
-            callback.apply(void 0, __spread([null], args));
+            callback(null, ...args);
         });
     });
 }
 function pitch(remainingRequest, _, dataInput) {
     var _this = this;
-    var options = __assign({}, createDefaults(), loader_utils_1.getOptions(this));
+    var options = {...createDefaults(), ...loader_utils_1.getOptions(this)};
     var cacheMetadata = options.cacheMetadata;
     // eslint-disable-next-line no-warning-comments
     // TODO: validate cacheMetadata in validateOptions.
@@ -348,7 +310,7 @@ function pitch(remainingRequest, _, dataInput) {
                 cacheData.contextDependencies.forEach(function (dep) {
                     return _this.addContextDependency(dep.path);
                 });
-                callback.apply(void 0, __spread([null], cacheData.result));
+                callback(null, ...cacheData.result);
             });
         });
     });
